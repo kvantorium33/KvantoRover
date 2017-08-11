@@ -1,0 +1,2 @@
+Запуск трансляции камеры
+/usr/bin/uv4l -k --sched-fifo --mem-lock --config-file=/etc/uv4l/uv4l-raspicam.conf --driver raspicam --driver-config-file=/etc/uv4l/uv4l-raspicam.conf --server-option=--editable-config-file=/etc/uv4l/uv4l-raspicam.conf
