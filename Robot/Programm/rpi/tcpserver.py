@@ -19,7 +19,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 resp = serialport.readline()
                 print resp
                 self.request.sendall(resp)
-                if(resp == "Robot is OK!\n")
+                if("Robot is OK!\" in resp)
                     break
 
 if __name__ == "__main__":
