@@ -65,13 +65,7 @@ namespace KvantoRover
                 {
                     try
                     {
-                        Byte[] data = System.Text.Encoding.ASCII.GetBytes(tbCommand.Text);
-                        tcpStream.Write(data, 0, data.Length);
-                        data = new Byte[256];
-                        String responseData = String.Empty;
-                        Int32 bytes = tcpStream.Read(data, 0, data.Length);
-                        responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                        tbResponse.Text = responseData;
+                        sendCmd(t);
                     } catch(Exception err)
                     {
                         tbResponse.Text = err.Message;
@@ -80,6 +74,17 @@ namespace KvantoRover
             }
             //Keyboard.IsKeyDown(Key.Return)
             //DisplayControllerInformation();
+        }
+
+        private void sendCmd(String cmd)
+        {
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(cmd + "\n");
+            tcpStream.Write(data, 0, data.Length);
+            data = new Byte[256];
+            String responseData = String.Empty;
+            Int32 bytes = tcpStream.Read(data, 0, data.Length);
+            responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+            tbResponse.Text = responseData;
         }
 
         private void GoFullscreen(bool fullscreen)
@@ -128,6 +133,7 @@ namespace KvantoRover
                     mjpeg.ParseStream(new Uri("http://" + tbRobotAddr.Text + ":8099"));
                     tcpClient = new TcpClient(tbRobotAddr.Text, 9999);
                     tcpStream = tcpClient.GetStream();
+                    sendCmd("RESET");
                     btnConnect.Text = "Disconnect";
                     tbRobotAddr.Enabled = false;
                     connected = true;

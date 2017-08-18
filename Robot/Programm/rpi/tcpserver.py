@@ -14,10 +14,13 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             print self.data
             # just send back the same data, but upper-cased
             serialport.write(self.data)
-            resp = serialport.readline()
             print "Robot answer:"
-            print resp
-            self.request.sendall(resp)
+            while True:
+                resp = serialport.readline()
+                print resp
+                self.request.sendall(resp)
+                if(resp == "Robot is OK!\n")
+                    break
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999

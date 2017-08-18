@@ -34,6 +34,10 @@ void KvantoRover::processCommand(byte* buffer, byte nCount){
   char c;
   for(unsigned int i=0; i < nCount;i++) {
     c = (char)buffer[i];
+    SerialUSB.print(c);
+    SerialUSB.print(" = ");
+    SerialUSB.println((int)buffer[i]);
+
     switch(c) {
       case '\n':
         applyCommand(cmd, val);
@@ -90,6 +94,12 @@ void KvantoRover::updateRobot() {
     if(sp_right > 1000) sp_right = 1000;
     if(sp_right < -1000) sp_right = -1000;
   }
+
+  SerialUSB.print("R:");
+  SerialUSB.print(sp_right);
+  SerialUSB.print("; L:");
+  SerialUSB.print(sp_left);
+  SerialUSB.println("");
 
   if(sp_right < 0)
     sp_right = abs(sp_right) | 0x400;
