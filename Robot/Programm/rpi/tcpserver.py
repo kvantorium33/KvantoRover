@@ -14,7 +14,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         # just send back the same data, but upper-cased
         serialport.write(self.data)
         resp = serialport.readline()
-        self.request.sendall(resp."\n")
+        self.request.sendall(resp)
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999

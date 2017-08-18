@@ -1,27 +1,41 @@
 ﻿using MjpegProcessor;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Threading;
+using DeviceManagement;
 
 namespace KvantoRover
 {
     public partial class Form1 : Form
     {
-        MjpegDecoder _mjpeg;
+        MjpegDecoder mjpeg;
+        DeviceInfo xbox;
+        TcpClient tcpClient;
+        DispatcherTimer timer = new DispatcherTimer();
+        bool connected = false;
 
         public Form1()
         {
             InitializeComponent();
-            _mjpeg = new MjpegDecoder();
-            _mjpeg.FrameReady += mjpeg_FrameReady;
+            mjpeg = new MjpegDecoder();
+            mjpeg.FrameReady += mjpeg_FrameReady;
             // GoFullscreen(true);
+            var allClasses = DeviceInfoSet.GetAllClassesPresent();
+            var devices = allClasses.GetDevices();
+            xbox = (from device in devices where device.ClassName == "XboxComposite" select device).FirstOrDefault();
+            timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            timer.Tick += timerTick;
+            timer.Start();
+        }
+
+        private void timerTick(object sender, EventArgs e)
+        {
+
+            //DisplayControllerInformation();
         }
 
         private void GoFullscreen(bool fullscreen)
@@ -44,18 +58,10 @@ namespace KvantoRover
             image.Image = e.Bitmap;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            _mjpeg.ParseStream(new Uri("http://192.168.70.3:8099"));
-            // player.con
-            //player.playlist.add("http://192.168.70.3:8099");
-            //yer.playlist.play();
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
             TcpClient client = new TcpClient("192.168.70.3", 9999);
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(textBox1.Text);
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(tbRobotAddr.Text);
             NetworkStream stream = client.GetStream();
             stream.Write(data, 0, data.Length);
             data = new Byte[256];
@@ -67,9 +73,29 @@ namespace KvantoRover
             client.Close();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void btnConnect_Click(object sender, EventArgs e)
         {
-
+            if(connected)
+            {
+                mjpeg.StopStream();
+                tcpClient.Close();
+                btnConnect.Text = "Connect";
+                tbRobotAddr.Enabled = true;
+                connected = false; 
+            } else
+            {
+                try
+                {
+                    mjpeg.ParseStream(new Uri("http://" + tbRobotAddr.Text + ":8099"));
+                    tcpClient = new TcpClient(tbRobotAddr.Text, 9999);
+                    btnConnect.Text = "Disconnect";
+                    tbRobotAddr.Enabled = false;
+                    connected = true;
+                } catch(Exception err)
+                {
+                    MessageBox.Show(err.Message);
+                }
+            }
         }
     }
 }
