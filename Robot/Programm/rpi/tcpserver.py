@@ -2,7 +2,7 @@ import SocketServer
 import serial
 import time
 
-serialport = serial.Serial(port="/dev/ttyACM0", baudrate=57600, bytesize=8, timeout=3)
+serialport = serial.Serial(port="/dev/ttyACM0", baudrate=9600, timeout=3)
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 

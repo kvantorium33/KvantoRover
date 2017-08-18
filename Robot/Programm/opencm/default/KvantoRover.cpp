@@ -25,6 +25,13 @@ void KvantoRover::loop() {
 }
 
 void KvantoRover::processCommand(byte* buffer, byte nCount){
+  SerialUSB.print("Len: ");
+  SerialUSB.print(nCount);
+  SerialUSB.print("; Cmd: ");
+  for(unsigned int i=0; i < nCount;i++)
+    SerialUSB.print((char)buffer[i]);
+  SerialUSB.println("");
+
   char cmd[8];
   char val[8];
   byte pos = 0;
@@ -34,10 +41,6 @@ void KvantoRover::processCommand(byte* buffer, byte nCount){
   char c;
   for(unsigned int i=0; i < nCount;i++) {
     c = (char)buffer[i];
-    SerialUSB.print(c);
-    SerialUSB.print(" = ");
-    SerialUSB.println((int)buffer[i]);
-
     switch(c) {
       case '\n':
         applyCommand(cmd, val);
