@@ -14,6 +14,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         # just send back the same data, but upper-cased
         serialport.write(self.data)
         resp = serialport.readline()
+        print "Robot answer:"
+        print resp
         self.request.sendall(resp)
 
 if __name__ == "__main__":

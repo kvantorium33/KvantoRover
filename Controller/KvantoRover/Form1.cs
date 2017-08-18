@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Windows.Forms;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using DeviceManagement;
 
@@ -15,6 +15,8 @@ namespace KvantoRover
         MjpegDecoder mjpeg;
         DeviceInfo xbox;
         TcpClient tcpClient;
+        NetworkStream tcpStream;
+
         DispatcherTimer timer = new DispatcherTimer();
         bool connected = false;
 
@@ -32,9 +34,51 @@ namespace KvantoRover
             timer.Start();
         }
 
+
         private void timerTick(object sender, EventArgs e)
         {
-
+            String t = "";
+            if(Keyboard.IsKeyDown(Key.Up))
+            {
+                t += "X:255;";
+            } else if(Keyboard.IsKeyDown(Key.Down)) {
+                t += "X:-255;";
+            } else
+            {
+                t += "X:0;";
+            }
+            if (Keyboard.IsKeyDown(Key.Left))
+            {
+                t += "Y:255;";
+            }
+            else if (Keyboard.IsKeyDown(Key.Right))
+            {
+                t += "Y:-255;";
+            } else
+            {
+                t += "Y:0;";
+            }
+            if(tbCommand.Text != t)
+            {
+                tbCommand.Text = t;
+                if(connected)
+                {
+                    try
+                    {
+                        Byte[] data = System.Text.Encoding.ASCII.GetBytes(tbCommand.Text);
+                        tcpStream.Write(data, 0, data.Length);
+                        data = new Byte[256];
+                        String responseData = String.Empty;
+                        Int32 bytes = tcpStream.Read(data, 0, data.Length);
+                        responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                        tbResponse.Text = responseData;
+                    } catch(Exception err)
+                    {
+                        tbResponse.Text = err.Message;
+                    }
+                }
+            }
+            //Keyboard.IsKeyDown(Key.Return)
             //DisplayControllerInformation();
         }
 
@@ -60,42 +104,57 @@ namespace KvantoRover
 
         private void button2_Click(object sender, EventArgs e)
         {
-            TcpClient client = new TcpClient("192.168.70.3", 9999);
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(tbRobotAddr.Text);
-            NetworkStream stream = client.GetStream();
-            stream.Write(data, 0, data.Length);
-            data = new Byte[256];
-            String responseData = String.Empty;
-            Int32 bytes = stream.Read(data, 0, data.Length);
-            responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-            MessageBox.Show(responseData);
-            stream.Close();
-            client.Close();
         }
 
-        private void btnConnect_Click(object sender, EventArgs e)
+        private void disconnect()
         {
             if(connected)
             {
                 mjpeg.StopStream();
+                tcpStream.Close();
                 tcpClient.Close();
                 btnConnect.Text = "Connect";
                 tbRobotAddr.Enabled = true;
-                connected = false; 
-            } else
+                connected = false;
+            }
+        }
+
+        private void connect()
+        {
+            if(!connected)
             {
                 try
                 {
                     mjpeg.ParseStream(new Uri("http://" + tbRobotAddr.Text + ":8099"));
                     tcpClient = new TcpClient(tbRobotAddr.Text, 9999);
+                    tcpStream = tcpClient.GetStream();
                     btnConnect.Text = "Disconnect";
                     tbRobotAddr.Enabled = false;
                     connected = true;
-                } catch(Exception err)
+                }
+                catch (Exception err)
                 {
                     MessageBox.Show(err.Message);
                 }
             }
+        }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            if (connected)
+                disconnect();
+            else
+                connect();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            disconnect();
+        }
+
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
         }
     }
 }
