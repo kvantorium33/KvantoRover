@@ -1,4 +1,8 @@
 import SocketServer
+import serial
+import time
+
+serialport = serial.Serial(port="/dev/ttyACM0", baudrate=57600, bytesize=8, timeout=3)
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
@@ -8,7 +12,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print "{} wrote:".format(self.client_address[0])
         print self.data
         # just send back the same data, but upper-cased
-        self.request.sendall("OK!\n")
+        serialport.write(self.data)
+        resp = serialport.readline()
+        self.request.sendall(resp."\n")
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999
