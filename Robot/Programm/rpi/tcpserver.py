@@ -13,7 +13,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             print "{} wrote:".format(self.client_address[0])
             print self.data
             # just send back the same data, but upper-cased
-            serialport.write(self.data)
+            serialport.write(self.data + "\n")
             print "Robot answer:"
             resp = serialport.readline()
             print resp

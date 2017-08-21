@@ -11,22 +11,29 @@ byte cmd[255];
 byte len = 0;
 
 void setup() {
+  delay(2000);
+  SerialUSB.println("Openning Serial port...");
   Serial2.begin(57600);
   Serial2.attachInterrupt(serialInterrupt);
+  SerialUSB.println("Initializing Dynamixel port...");
   Dxl.begin(3);
+  SerialUSB.println("Initializing Robot...");
   Robot.setup(&Dxl);
+  SerialUSB.println("Setup OK.");
 }
 
 void serialInterrupt(byte buf){
+  if(len < 255) {
+    cmd[len] = buf;
+    len++;
+  } else {
+    SerialUSB.println("Command buffer overlow");
+  }
   if(buf == '\n') {
-    SerialUSB.print(buf);
     Robot.processCommand(cmd, len);
     Robot.printStatus(&Serial2);
     memset(cmd, 0, 255);
     len = 0;
-  } else {
-    cmd[len] = buf;
-    len++;
   }
 }
 

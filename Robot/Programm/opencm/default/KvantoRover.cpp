@@ -79,13 +79,18 @@ void KvantoRover::printStatus(HardwareSerial *port) {
 }
 
 void KvantoRover::applyCommand(char *cmd, char *val) {
-  if(strcmp(cmd, "X") == 0) {
+  if(cmd[0] == 0x0) {
+    return;
+  } else if(strcmp(cmd, "X") == 0) {
     ctrl.x = atoi(val);
   } else if(strcmp(cmd, "Y") == 0) {
     ctrl.y = atoi(val);
   } else if(strcmp(cmd, "RESET") == 0) {
     ctrl.x = 0;
     ctrl.y = 0;
+  } else {
+    SerialUSB.print("Unknown command ");
+    SerialUSB.println(cmd);
   }
 }
 
@@ -101,6 +106,7 @@ void KvantoRover::updateRobot() {
     if(sp_right < -1000) sp_right = -1000;
   }
 
+  SerialUSB.print("KvantoRover: ");
   SerialUSB.print("R:");
   SerialUSB.print(sp_right);
   SerialUSB.print("; L:");
