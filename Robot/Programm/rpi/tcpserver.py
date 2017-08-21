@@ -2,7 +2,7 @@ import SocketServer
 import serial
 import time
 
-serialport = serial.Serial(port="/dev/ttyACM0", baudrate=9600, timeout=3)
+serialport = serial.Serial(port="/dev/serial0", baudrate=57600, timeout=3)
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
@@ -15,12 +15,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             # just send back the same data, but upper-cased
             serialport.write(self.data)
             print "Robot answer:"
-            while True:
-                resp = serialport.readline()
-                print resp
-                self.request.sendall(resp)
-                if resp.find("Robot is OK!") != -1:
-                    break
+            resp = serialport.readline()
+            print resp
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999
