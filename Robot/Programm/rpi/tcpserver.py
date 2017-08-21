@@ -17,6 +17,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             print "Robot answer:"
             resp = serialport.readline()
             print resp
+            self.request.sendall(resp)
+
 
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999
