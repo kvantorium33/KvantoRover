@@ -3,15 +3,17 @@
 #include "usb_serial.h"
 #include "Arduino-compatibles.h"
 #include <string.h>
+#include "HardwareSerial.h"
 
 #define ID_NUM 1
 
 KvantoRover::KvantoRover() {
-
+  SerialUSB.println("KvantoRover: contructor done");
 }
 
 void KvantoRover::setup(Dynamixel *dxl) {
   this->dxl = dxl;
+
   this->dxl->wheelMode(DXL_WHEEL_LEFT_FRONT);
   this->dxl->wheelMode(DXL_WHEEL_LEFT_MIDDLE);
   this->dxl->wheelMode(DXL_WHEEL_LEFT_REAR);
@@ -19,13 +21,14 @@ void KvantoRover::setup(Dynamixel *dxl) {
   this->dxl->wheelMode(DXL_WHEEL_RIGHT_MIDDLE);
   this->dxl->wheelMode(DXL_WHEEL_RIGHT_REAR);
   updateRobot();
+  SerialUSB.println("KvantoRover: setup done");
 }
 
 void KvantoRover::loop() {
 }
 
 void KvantoRover::processCommand(byte* buffer, byte nCount){
-  SerialUSB.print("Len: ");
+  SerialUSB.print("KvantoRover Command. Len: ");
   SerialUSB.print(nCount);
   SerialUSB.print("; Cmd: ");
   for(unsigned int i=0; i < nCount;i++)
@@ -71,8 +74,8 @@ void KvantoRover::processCommand(byte* buffer, byte nCount){
   }
 }
 
-void KvantoRover::printStatus() {
-  SerialUSB.write("Robot is OK!\n");
+void KvantoRover::printStatus(HardwareSerial *port) {
+  port->write("Robot is OK!\n");
 }
 
 void KvantoRover::applyCommand(char *cmd, char *val) {

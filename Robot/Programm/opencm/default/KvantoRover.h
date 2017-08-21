@@ -3,6 +3,7 @@
 
 #include "Dynamixel.h"
 #include "Arduino-compatibles.h"
+#include "HardwareSerial.h"
 
 #define DXL_WHEEL_LEFT_FRONT    2
 #define DXL_WHEEL_LEFT_MIDDLE   8
@@ -17,7 +18,7 @@ public:
   void setup(Dynamixel *dxl);
   void loop();
   void processCommand(byte* buffer, byte nCount);
-  void printStatus();
+  void printStatus(HardwareSerial *port);
 private:
   struct control {
     int x;
